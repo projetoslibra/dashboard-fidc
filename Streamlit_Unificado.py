@@ -50,7 +50,7 @@ if not st.session_state.autenticado:
     st.stop()
 
 # ======= MENU LATERAL =======
-menu = st.sidebar.radio("Selecione o painel:", ["📊 DRE dos Fundos", "📈 Posição Diária", "📉 Análise de PDD"])
+menu = st.sidebar.radio("Selecione o painel:", ["📊 DRE dos Fundos", "📈 Posição Diária"]) #"📉 Análise de PDD"
 
 # ======= ROTEADOR =======
 if menu == "📊 DRE dos Fundos":
