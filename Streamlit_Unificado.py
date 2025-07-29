@@ -1,6 +1,8 @@
 import streamlit as st
 import Streamlit_Libra
 import Streamlit_Posicao
+import Streamlit_PDD
+
 
 st.set_page_config(page_title="Dashboard LIBRA", layout="wide")
 
@@ -48,10 +50,12 @@ if not st.session_state.autenticado:
     st.stop()
 
 # ======= MENU LATERAL =======
-menu = st.sidebar.radio("Selecione o painel:", ["📊 DRE dos Fundos", "📈 Posição Diária"])
+menu = st.sidebar.radio("Selecione o painel:", ["📊 DRE dos Fundos", "📈 Posição Diária", "📉 Análise de PDD"])
 
 # ======= ROTEADOR =======
 if menu == "📊 DRE dos Fundos":
     Streamlit_Libra.run()
 elif menu == "📈 Posição Diária":
     Streamlit_Posicao.run()
+elif menu == "📉 Análise de PDD":
+    Streamlit_PDD.run()
