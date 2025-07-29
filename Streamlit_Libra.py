@@ -128,16 +128,14 @@ def run():
 
     st.set_page_config(page_title=f"DRE - Fundo {fundo_sel}", layout="wide")
 
-    # Título com logo à direita
-    st.markdown(
-        f"""
-        <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;'>
-            <h1 style='margin: 0; font-size: 2.3rem;'>DRE - Fundo {fundo_sel}</h1>
-            <img src="https://raw.githubusercontent.com/projetoslibra/dashboard-fidc/main/Imagens/Capital-branca.png" style="height: 120px;" />
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    # Título com logo à direita (usando st.columns + imagem local)
+    col1, col2 = st.columns([0.75, 0.25])
+
+    with col1:
+        st.markdown(f"<h1 style='margin: 0; font-size: 2.3rem;'>DRE - Fundo {fundo_sel}</h1>", unsafe_allow_html=True)
+
+    with col2:
+        st.image("Imagens/Capital-branca.png", width=120)
 
     # === SIDEBAR: FILTRO DE DATA ===
     st.sidebar.title("Filtro de Data")
