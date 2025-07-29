@@ -133,7 +133,7 @@ def run():
         f"""
         <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;'>
             <h1 style='margin: 0; font-size: 2.3rem;'>DRE - Fundo {fundo_sel}</h1>
-            <img src="https://raw.githubusercontent.com/projetoslibra/streamlit-DRE/main/Imagens/Capital-branca.png" style="height: 120px;" />
+            <img src="https://raw.githubusercontent.com/projetoslibra/dashboard-fidc/main/Imagens/Capital-branca.png" style="height: 120px;" />
         </div>
         """,
         unsafe_allow_html=True
