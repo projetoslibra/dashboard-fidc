@@ -27,7 +27,8 @@ usuarios = {
     "Joao": "LibraJP",
     "Estevan": "LibraDRE2025",
     "Breno": "LibraDRE2025",
-    "Juan": "LibraJM"
+    "Juan": "LibraJM",
+    "Nelson": "LibraDRE2025"
 }
 
 if "autenticado" not in st.session_state:
