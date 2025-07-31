@@ -75,7 +75,7 @@ def run():
     colunas_percentuais = [
         "Rentabilidade Dia",
         "Rentabilidade Mês",
-        "Rentabilidade Ano"
+        "Rentabilidade Ano",
         "Subordinação Mezanino",
         "Subordinação Senior",
         "aa"
