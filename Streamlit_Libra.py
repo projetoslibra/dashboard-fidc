@@ -75,12 +75,13 @@ def run():
     colunas_percentuais = [
         "Rentabilidade Dia",
         "Rentabilidade Mês",
+        "Rentabilidade Ano"
         "Subordinação Mezanino",
         "Subordinação Senior",
-        "Rentabilidade Ano"
+        "aa"
     ]
 
-    colunas_cor_condicional = ["Rentabilidade Dia", "Rentabilidade Mês", "Rentabilidade Ano"]
+    colunas_cor_condicional = ["Rentabilidade Dia", "Rentabilidade Mês", "Rentabilidade Ano", "aa"]
 
     linhas_destaque = [
         "PL JR INICIAL", "QTD COTAS", "VALOR COTA", "ATIVOS", "DC", "SUPERIORES",
