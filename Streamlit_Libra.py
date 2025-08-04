@@ -278,7 +278,7 @@ def run():
     # Função para destacar linhas especiais
     def highlight_linhas_especiais(row):
         if str(row.iloc[0]).strip() in linhas_destaque:
-            return ['background-color: #4169E1; font-weight: bold'] * len(row)
+            return ['background-color: #66c4ff; font-weight: bold'] * len(row)
         return [''] * len(row)
 
     table_styles = [
@@ -317,7 +317,7 @@ def run():
 
     def highlight_linhas_especiais(row):
         if str(row[0]).strip() in linhas_destaque:
-            return ['background-color: #4169E1; font-weight: bold'] * len(row)
+            return ['background-color: #66c4ff; font-weight: bold'] * len(row)
         return [''] * len(row)
 
     # Estilos CSS para centralizar conteúdo e cabeçalhos
