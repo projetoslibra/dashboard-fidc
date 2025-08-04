@@ -83,9 +83,10 @@ def run():
     colunas_cor_condicional = ["Rentabilidade Dia", "Rentabilidade Mês", "Rentabilidade Ano"]
 
     linhas_destaque = [
-        "PL JR INICIAL", "QTD COTAS", "VALOR COTA", "ATIVOS", "DC", "SUPERIORES",
-        "Valores a Liquidar / Receber", "PDD DC", "Resultado", "Total do Patrimônio",
-        "QTD COTAS", "Valor Cota", "Rentabilidade Dia", "Rentabilidade Mês"
+        # blocos que precisam de linha em branco + destaque
+        "ATIVOS", "SUPERIORES", "PAGAMENTOS", "CAIXA", "PDD", "Resultado",
+        # as três linhas finais (não terão linha em branco antes)
+        "Total do Patrimônio", "QTD COTAS", "Valor Cota"
     ]
 
     def formatar_valor(coluna, valor):
@@ -232,6 +233,15 @@ def run():
         return df
 
     df_original = ler_google_sheet_original(SHEET_ID, ABA_ORIGINAL)
+    
+    
+    #corte opcional para ignorar todas as linhas do sheet abaixo de "valor cota"
+    idx_end = df_original.index[
+        df_original.iloc[:, 0].astype(str).str.strip() == "Valor Cota"
+    ]
+    if not idx_end.empty:
+        df_original = df_original.loc[: idx_end[0]]
+
 
     # Insere linha em branco antes das linhas de destaque (exceto as 3 últimas)
     indices_destaque = [
