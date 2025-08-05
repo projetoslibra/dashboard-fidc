@@ -12,10 +12,28 @@ st.markdown("""
     [data-testid="stSidebar"] {
         background-color: #FFF4E3 !important;
         border-right: 2px solid #e5a12522 !important;
-        color: #C66300 !important;
     }
+
     [data-testid="stSidebar"] * {
         color: #C66300 !important;
+    }
+
+    /* Corrige cor dos ícones, labels e opções de rádio */
+    [data-testid="stSidebar"] label, 
+    [data-testid="stSidebar"] .css-16idsys, 
+    [data-testid="stSidebar"] .css-10trblm, 
+    [data-testid="stSidebar"] .css-1v3fvcr {
+        color: #C66300 !important;
+    }
+
+    /* Corrige radio button ativo */
+    [data-testid="stSidebar"] .st-ef {
+        color: #C66300 !important;
+    }
+
+    /* Corrige marcador ativo */
+    [data-testid="stSidebar"] .st-em {
+        background-color: #C6630033 !important;  /* leve destaque para opção ativa */
     }
     </style>
 """, unsafe_allow_html=True)
