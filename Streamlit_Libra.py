@@ -16,6 +16,45 @@ def run():
     VERDE = "#a4f4b8"
     VERMELHO = "#f4b4b4"
 
+
+
+
+        # ========== CSS VISUAL PREMIUM (SIDEBAR) ==========
+    st.markdown(f"""
+    <style>
+        [data-testid="stSidebar"] {{
+            background-color: {HONEYDEW} !important;
+            border-right: 2px solid {HARVEST_GOLD}22 !important;
+        }}
+        [data-testid="stSidebar"] * {{
+            color: {HARVEST_GOLD} !important;
+        }}
+        [data-testid="stSidebar"] label, 
+        [data-testid="stSidebar"] .css-16idsys, 
+        [data-testid="stSidebar"] .css-10trblm, 
+        [data-testid="stSidebar"] .css-1v3fvcr {{
+            color: {HARVEST_GOLD} !important;
+        }}
+        [data-testid="stSidebar"] .st-ef {{
+            color: {HARVEST_GOLD} !important;
+        }}
+        [data-testid="stSidebar"] .st-em {{
+            background-color: {HARVEST_GOLD}33 !important;
+        }}
+    </style>
+    """, unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
+
+
+
     # ========== CSS VISUAL PREMIUM ========== 
     st.markdown(f"""
     <style>
