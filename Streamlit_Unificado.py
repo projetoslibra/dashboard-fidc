@@ -15,7 +15,7 @@ st.markdown("""
         color: #C66300 !important;
     }
     [data-testid="stSidebar"] * {
-        color: #e5a125 !important;
+        color: #C66300 !important;
     }
     </style>
 """, unsafe_allow_html=True)
