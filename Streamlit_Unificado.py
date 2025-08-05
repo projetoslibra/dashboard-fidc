@@ -10,9 +10,9 @@ st.set_page_config(page_title="Dashboard LIBRA", layout="wide")
 st.markdown("""
     <style>
     [data-testid="stSidebar"] {
-        background-color: #DCDCDC !important;
+        background-color: #FFF4E3 !important;
         border-right: 2px solid #e5a12522 !important;
-        color: #e5a125 !important;
+        color: #C66300 !important;
     }
     [data-testid="stSidebar"] * {
         color: #e5a125 !important;
