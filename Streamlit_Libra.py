@@ -11,7 +11,7 @@ def run():
     # =================== CORES ===================
     SPACE_CADET = "#042F3C"
     HARVEST_GOLD = "#e5a125"
-    HONEYDEW = "#f0f8ea"
+    HONEYDEW = "#FFF4E3"
     SLATE_GRAY = "#717c89"
     VERDE = "#a4f4b8"
     VERMELHO = "#f4b4b4"
