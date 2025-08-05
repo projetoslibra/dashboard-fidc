@@ -9,9 +9,9 @@ import re
 
 def run():
     # =================== CORES ===================
-    SPACE_CADET = "#272846"
-    HARVEST_GOLD = "#e5a125"
-    HONEYDEW = "#f0f8ea"
+    SPACE_CADET = "#042F3C"
+    HARVEST_GOLD = "#C66300"
+    HONEYDEW = "#FFF4E3"
     SLATE_GRAY = "#717c89"
 
     # ========== CSS VISUAL PREMIUM ==========
