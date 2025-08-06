@@ -9,31 +9,26 @@ st.set_page_config(page_title="Dashboard LIBRA", layout="wide")
 
 st.markdown("""
     <style>
+    /* ===== Ajustes de largura e overflow da sidebar ===== */
     [data-testid="stSidebar"] {
-        background-color: #FFF4E3 !important;
-        border-right: 2px solid #e5a12522 !important;
+        width: 360px !important;          /* ajuste para 330–400 se quiser */
+        min-width: 360px !important;
+        overflow: visible !important;      /* evita cortar o popover */
     }
 
-    [data-testid="stSidebar"] * {
-        color: #C66300 !important;
+    /* Garante que containers internos não cortem o calendário */
+    [data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        overflow: visible !important;
     }
 
-    /* Corrige cor dos ícones, labels e opções de rádio */
-    [data-testid="stSidebar"] label, 
-    [data-testid="stSidebar"] .css-16idsys, 
-    [data-testid="stSidebar"] .css-10trblm, 
-    [data-testid="stSidebar"] .css-1v3fvcr {
-        color: #C66300 !important;
+    /* Datepicker ocupa toda a largura disponível */
+    [data-testid="stSidebar"] .stDateInput div[data-baseweb="datepicker"] {
+        width: 100% !important;
     }
 
-    /* Corrige radio button ativo */
-    [data-testid="stSidebar"] .st-ef {
-        color: #C66300 !important;
-    }
-
-    /* Corrige marcador ativo */
-    [data-testid="stSidebar"] .st-em {
-        background-color: #C6630033 !important;  /* leve destaque para opção ativa */
+    /* (Opcional) dá um respiro ao input do datepicker */
+    [data-testid="stSidebar"] .stDateInput > div {
+        width: 100% !important;
     }
     </style>
 """, unsafe_allow_html=True)

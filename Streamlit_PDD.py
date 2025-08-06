@@ -68,7 +68,7 @@ def run():
     df["PDD Prevista"] = pd.to_numeric(df["PDD Prevista"], errors="coerce").fillna(0.0)
 
     # ========= DRILL-DOWN AGGRID (Cedente -> NOME_SACADO) =========
-    #st.markdown("---")
+
     st.subheader("🔁 PDD por Cedente e Sacado (com variação diária)")
 
     # Linhas = (Cedente, NOME_SACADO), Colunas = Datas
