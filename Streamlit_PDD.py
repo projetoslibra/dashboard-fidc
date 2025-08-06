@@ -10,7 +10,7 @@ def run():
     AZUL_MUDANCA = "#3c71e8"
 
     # ========== CSS VISUAL PREMIUM ==========
-    st.set_page_config(page_title="Análise PDD", layout="wide")
+
     st.markdown(f"""
         <style>
             html, body, .stApp, .block-container {{
