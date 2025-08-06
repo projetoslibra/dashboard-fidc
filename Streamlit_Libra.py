@@ -129,7 +129,6 @@ def run():
             .astype(float)
         )
 
-    st.set_page_config(page_title=f"DRE - Fundo {fundo_sel}", layout="wide")
 
     # Título com logo à direita (usando st.columns + imagem local)
     col1, col2 = st.columns([0.75, 0.25])
