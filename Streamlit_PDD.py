@@ -207,7 +207,6 @@ def run():
             height=560,
             allow_unsafe_jscode=True,
             custom_css=custom_css,
-            theme="balham-dark",
         )
 
     except Exception as e:
