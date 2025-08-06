@@ -68,7 +68,7 @@ def run():
     df["PDD Prevista"] = pd.to_numeric(df["PDD Prevista"], errors="coerce").fillna(0.0)
 
     # ========= DRILL-DOWN AGGRID (Cedente -> NOME_SACADO) =========
-    st.markdown("---")
+    #st.markdown("---")
     st.subheader("🔁 PDD por Cedente e Sacado (com variação diária)")
 
     # Linhas = (Cedente, NOME_SACADO), Colunas = Datas
@@ -197,6 +197,7 @@ def run():
             ".ag-header, .ag-floating-bottom": { "border": "none" }
         }
 
+
         AgGrid(
             pivot_sacado,
             gridOptions=grid_options,
@@ -206,7 +207,7 @@ def run():
             height=560,
             allow_unsafe_jscode=True,
             custom_css=custom_css,
-            theme="streamlit",
+            theme="balham-dark",
         )
 
     except Exception as e:
