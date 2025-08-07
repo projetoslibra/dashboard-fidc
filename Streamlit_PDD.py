@@ -263,7 +263,8 @@ def run():
 
         # Wrapper para fullscreen
         st.markdown(f'<div class="{wrapper_class}">', unsafe_allow_html=True)
-
+        st.write("Renderizando grid...")
+        st.dataframe(pivot_sacado.head())
         AgGrid(
             pivot_sacado,
             gridOptions=grid_options,
