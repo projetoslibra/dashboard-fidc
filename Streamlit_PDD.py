@@ -210,7 +210,7 @@ def run():
         )
 
         # --- parâmetros que mudam de acordo com o estado do toggle ---
-        grid_height   = None if fullscreen else 560        # None = 100 % da div
+        grid_height   = 800 if fullscreen else 560        # None = 100 % da div
         grid_dom      = "normal" if fullscreen else "autoHeight"
         wrapper_class = "fullscreen-grid" if fullscreen else ""
 
@@ -218,40 +218,33 @@ def run():
         if fullscreen:
             st.markdown("""
                 <style>
-                    /* remove margens laterais do app  */
-                    [data-testid="stAppViewContainer"] { padding: 0 !important; }
-                    /* esconde a sidebar para ganhar espaço */
-                    [data-testid="stSidebar"] { display: none; }
-
-                    /* div englobando a AgGrid */
+                    [data-testid="stAppViewContainer"] { padding:0!important; }
+                    [data-testid="stSidebar"] { display:none; }
                     .fullscreen-grid{
-                        position: fixed !important;
-                        top: 0; left: 0;
-                        width: 100vw; height: 100vh;
-                        z-index: 9999;
-                        background: #042F3C;
-                        padding: 1rem 1rem 3rem 1rem;
-                        overflow: auto;
+                        position:fixed!important; top:0; left:0;
+                        width:100vw; height:100vh;
+                        z-index:9999; background:#042F3C;
+                        padding:1rem 1rem 3rem 1rem; overflow:auto;
                     }
-                    /* botão flutuante para sair */
                     .fechar-fs{
-                        position: fixed; right: 24px; top: 16px;
-                        background: #C66300; color: #FFF4E3; border: none;
-                        padding: 6px 10px; border-radius: 6px; cursor: pointer;
-                        z-index: 10000;
+                        position:fixed; right:24px; top:16px;
+                        background:#C66300; color:#FFF4E3; border:none;
+                        padding:6px 10px; border-radius:6px; cursor:pointer;
+                        z-index:10000;
                     }
                 </style>
             """, unsafe_allow_html=True)
 
-        # botão "Fechar" aparece só em tela cheia
-        if fullscreen:
+
             st.markdown(
                 '<button class="fechar-fs" onclick="window.location.reload()">Fechar</button>',
-                unsafe_allow_html=True
+            unsafe_allow_html=True
             )
 
-        # --- container opcional que vira tela cheia ---
-        st.markdown(f'<div class="{wrapper_class}">', unsafe_allow_html=True)
+        # sempre abrir / fechar o wrapper com ASPAS na class
+        wrapper_cls = "fullscreen-grid" if fullscreen else ""
+        st.markdown(f'<div class="{wrapper_cls}">', unsafe_allow_html=True)
+
 
         AgGrid(
             pivot_sacado,
