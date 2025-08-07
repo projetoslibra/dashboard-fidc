@@ -9,8 +9,6 @@ def run():
     SLATE_GRAY = "#717c89"
     AZUL_MUDANCA = "#3c71e8"
 
-
-
     # ========== CSS VISUAL PREMIUM ==========
     st.markdown(f"""
         <style>
@@ -198,111 +196,18 @@ def run():
             },
             ".ag-header, .ag-floating-bottom": { "border": "none" }
         }
-        
 
 
-
-
-        # === TOGGLE MODO TELA CHEIA =====================
-        fullscreen = st.toggle("🖥️ Modo Tela Cheia", value=False)
-
-        # altura do grid
-        grid_height = 800 if fullscreen else 560
-        grid_dom = "normal" if fullscreen else "autoHeight"
-        wrapper_class = "fullscreen-grid" if fullscreen else ""
-
-        # CSS para fullscreen
-        if fullscreen:
-            st.markdown("""
-                <style>
-                    /* Remove padding e esconde sidebar */
-                    [data-testid="stAppViewContainer"] {
-                        padding: 0 !important;
-                    }
-                    [data-testid="stSidebar"] {
-                        display: none;
-                    }
-
-                    .fullscreen-grid {
-                        position: fixed !important;
-                        top: 0;
-                        left: 0;
-                        width: 100vw;
-                        height: 100vh;
-                        background: #042F3C;
-                        z-index: 9999;
-                        overflow: auto;
-                        padding: 20px;
-                    }
-
-                    .fechar-fs {
-                        position: fixed;
-                        top: 10px;
-                        right: 20px;
-                        background-color: #C66300;
-                        color: #FFF4E3;
-                        border: none;
-                        padding: 8px 12px;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        z-index: 10000;
-                    }
-
-                    /* Remove header padrão do Streamlit para liberar espaço */
-                    header[data-testid="stHeader"] {
-                        display: none !important;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-
-            st.markdown(
-                '<button class="fechar-fs" onclick="window.location.reload()">❌ Fechar Tela Cheia</button>',
-                unsafe_allow_html=True
-            )
-
-        # Wrapper para fullscreen
-        st.markdown(f'<div class="{wrapper_class}">', unsafe_allow_html=True)
-        st.write("Renderizando grid...")
-        st.dataframe(pivot_sacado.head())
         AgGrid(
             pivot_sacado,
             gridOptions=grid_options,
             update_mode=GridUpdateMode.NO_UPDATE,
             enable_enterprise_modules=True,
             fit_columns_on_grid_load=False,
+            height=560,
             allow_unsafe_jscode=True,
             custom_css=custom_css,
-            use_container_width=True,
-            height=grid_height,
-            domLayout=grid_dom,
         )
-
-        st.markdown("</div>", unsafe_allow_html=True)
-        # === FIM DO NOVO BLOCO =========================================
-
-
-
-
-
-
-
-
-
-
-        
-        # AgGrid(
-        #     pivot_sacado,
-        #     gridOptions=grid_options,
-        #     update_mode=GridUpdateMode.NO_UPDATE,
-        #     enable_enterprise_modules=True,
-        #     fit_columns_on_grid_load=False,
-        #     height=560,
-        #     allow_unsafe_jscode=True,
-        #     custom_css=custom_css,
-        #     domLayout="normal",
-        # )
-
 
     except Exception as e:
         st.warning(f"AgGrid não pôde ser carregado ({e}). Exibindo fallback simples por cedente.")
