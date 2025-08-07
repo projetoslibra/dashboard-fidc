@@ -203,55 +203,65 @@ def run():
 
 
 
-        # === TOGGLE DE MODO TELA CHEIA ===
+        # === TOGGLE MODO TELA CHEIA =====================
         fullscreen = st.toggle("🖥️ Modo Tela Cheia", value=False)
 
-        # Define altura e layout do grid conforme o modo
+        # altura do grid
         grid_height = 800 if fullscreen else 560
         grid_dom = "normal" if fullscreen else "autoHeight"
-        wrapper_class = "fullscreen-grid" if fullscreen else "normal-grid"
+        wrapper_class = "fullscreen-grid" if fullscreen else ""
 
-        # === CSS ===
-        st.markdown(f"""
-            <style>
-                [data-testid="stAppViewContainer"] {{ padding: 0 !important; }}
-
-                .fullscreen-grid {{
-                    position: fixed !important;
-                    top: 0; left: 0;
-                    width: 100vw; height: 100vh;
-                    z-index: 9999;
-                    background: #042F3C;
-                    padding: 2rem 1rem 3rem 1rem;
-                    overflow: auto;
-                }}
-                .normal-grid {{
-                    padding: 0rem;
-                }}
-                .fechar-fs {{
-                    position: fixed;
-                    top: 16px;
-                    right: 16px;
-                    background-color: #C66300;
-                    color: #FFF4E3;
-                    border: none;
-                    padding: 8px 14px;
-                    border-radius: 6px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    z-index: 10000;
-                }}
-            </style>
-        """, unsafe_allow_html=True)
-
-        # Botão "Fechar" só aparece em fullscreen
+        # CSS para fullscreen
         if fullscreen:
+            st.markdown("""
+                <style>
+                    /* Remove padding e esconde sidebar */
+                    [data-testid="stAppViewContainer"] {
+                        padding: 0 !important;
+                    }
+                    [data-testid="stSidebar"] {
+                        display: none;
+                    }
+
+                    .fullscreen-grid {
+                        position: fixed !important;
+                        top: 0;
+                        left: 0;
+                        width: 100vw;
+                        height: 100vh;
+                        background: #042F3C;
+                        z-index: 9999;
+                        overflow: auto;
+                        padding: 20px;
+                    }
+
+                    .fechar-fs {
+                        position: fixed;
+                        top: 10px;
+                        right: 20px;
+                        background-color: #C66300;
+                        color: #FFF4E3;
+                        border: none;
+                        padding: 8px 12px;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        z-index: 10000;
+                    }
+
+                    /* Remove header padrão do Streamlit para liberar espaço */
+                    header[data-testid="stHeader"] {
+                        display: none !important;
+                    }
+                </style>
+            """, unsafe_allow_html=True)
+
             st.markdown(
                 '<button class="fechar-fs" onclick="window.location.reload()">❌ Fechar Tela Cheia</button>',
                 unsafe_allow_html=True
             )
 
-        # === CONTAINER HTML CORRETO COM CLASSE SEMPRE DEFINIDA ===
+        # Wrapper para fullscreen
         st.markdown(f'<div class="{wrapper_class}">', unsafe_allow_html=True)
 
         AgGrid(
