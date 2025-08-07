@@ -196,42 +196,19 @@ def run():
             },
             ".ag-header, .ag-floating-bottom": { "border": "none" }
         }
-
-
-
-
-        # === TOGGLE DE EXPANSÃO ===
-        expandir = st.toggle("🔍 Expandir Tabela", value=False)
-
-        altura_tabela = None if expandir else 560
-        layout_tabela = "normal" if expandir else "autoHeight"
-
-
+        
+        
         AgGrid(
             pivot_sacado,
             gridOptions=grid_options,
             update_mode=GridUpdateMode.NO_UPDATE,
             enable_enterprise_modules=True,
             fit_columns_on_grid_load=False,
+            height=560,
             allow_unsafe_jscode=True,
             custom_css=custom_css,
-            use_container_width=True,
-            height=altura_tabela,
-            domLayout=layout_tabela,
+            domLayout="normal",
         )
-        
-        
-        # AgGrid(
-        #     pivot_sacado,
-        #     gridOptions=grid_options,
-        #     update_mode=GridUpdateMode.NO_UPDATE,
-        #     enable_enterprise_modules=True,
-        #     fit_columns_on_grid_load=False,
-        #     height=560,
-        #     allow_unsafe_jscode=True,
-        #     custom_css=custom_css,
-        #     domLayout="normal",
-        # )
 
 
     except Exception as e:
