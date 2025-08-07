@@ -203,70 +203,71 @@ def run():
 
 
 
-        # === BOTÃO MODO TELA CHEIA =====================================
+        # === TOGGLE DE MODO TELA CHEIA ===
         fullscreen = st.toggle("🖥️ Modo Tela Cheia", value=False)
 
-        # --- parâmetros que mudam de acordo com o estado do toggle ---
-        grid_height   = 800 if fullscreen else 560        # None = 100 % da div
-        grid_dom      = "normal" if fullscreen else "autoHeight"
-        wrapper_class = "fullscreen-grid" if fullscreen else ""
+        # Define altura e layout do grid conforme o modo
+        grid_height = 800 if fullscreen else 560
+        grid_dom = "normal" if fullscreen else "autoHeight"
+        wrapper_class = "fullscreen-grid" if fullscreen else "normal-grid"
 
-        # --- CSS para ocupar a viewport inteira quando fullscreen ---
+        # === CSS ===
+        st.markdown(f"""
+            <style>
+                [data-testid="stAppViewContainer"] {{ padding: 0 !important; }}
+
+                .fullscreen-grid {{
+                    position: fixed !important;
+                    top: 0; left: 0;
+                    width: 100vw; height: 100vh;
+                    z-index: 9999;
+                    background: #042F3C;
+                    padding: 2rem 1rem 3rem 1rem;
+                    overflow: auto;
+                }}
+                .normal-grid {{
+                    padding: 0rem;
+                }}
+                .fechar-fs {{
+                    position: fixed;
+                    top: 16px;
+                    right: 16px;
+                    background-color: #C66300;
+                    color: #FFF4E3;
+                    border: none;
+                    padding: 8px 14px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    z-index: 10000;
+                }}
+            </style>
+        """, unsafe_allow_html=True)
+
+        # Botão "Fechar" só aparece em fullscreen
         if fullscreen:
-            st.markdown("""
-                <style>
-                    [data-testid="stAppViewContainer"] { padding: 0 !important; }
-                    [data-testid="stSidebar"] { display: none; }
-                    .fullscreen-grid {
-                        position: fixed !important;
-                        top: 0; left: 0;
-                        width: 100vw; height: 100vh;
-                        z-index: 9999;
-                        background: #042F3C;
-                        padding: 2rem 1rem 3rem 1rem;
-                        overflow: auto;
-                    }
-                    .fechar-fs {
-                        position: fixed;
-                        top: 16px;
-                        right: 16px;
-                        background-color: #C66300;
-                        color: #FFF4E3;
-                        border: none;
-                        padding: 8px 14px;
-                        border-radius: 6px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        z-index: 10000;
-                    }
-                </style>
-            """, unsafe_allow_html=True)
-
             st.markdown(
                 '<button class="fechar-fs" onclick="window.location.reload()">❌ Fechar Tela Cheia</button>',
                 unsafe_allow_html=True
             )
 
+        # === CONTAINER HTML CORRETO COM CLASSE SEMPRE DEFINIDA ===
+        st.markdown(f'<div class="{wrapper_class}">', unsafe_allow_html=True)
 
+        AgGrid(
+            pivot_sacado,
+            gridOptions=grid_options,
+            update_mode=GridUpdateMode.NO_UPDATE,
+            enable_enterprise_modules=True,
+            fit_columns_on_grid_load=False,
+            allow_unsafe_jscode=True,
+            custom_css=custom_css,
+            use_container_width=True,
+            height=grid_height,
+            domLayout=grid_dom,
+        )
 
-        # ========== WRAPPER DE RENDER ==========
-        with st.container():
-            st.markdown(f'<div class="{wrapper_class}">', unsafe_allow_html=True)
-
-            AgGrid(
-                pivot_sacado,
-                gridOptions=grid_options,
-                update_mode=GridUpdateMode.NO_UPDATE,
-                enable_enterprise_modules=True,
-                fit_columns_on_grid_load=False,
-                allow_unsafe_jscode=True,
-                custom_css=custom_css,
-                use_container_width=True,
-                height=grid_height,
-                domLayout=grid_dom,
-            )
-
-            st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
         # === FIM DO NOVO BLOCO =========================================
 
 
