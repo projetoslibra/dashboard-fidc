@@ -3,10 +3,13 @@ import Streamlit_Libra
 import Streamlit_Posicao
 import Streamlit_PDD
 
+# ==== NOVO: cookies e token ====
+import time, json, hmac, hashlib, base64
+from streamlit_cookies_manager import EncryptedCookieManager
 
 st.set_page_config(page_title="Dashboard LIBRA", layout="wide")
 
-
+# ====== CSS (seu código) ======
 st.markdown("""
     <style>
     /* ===== Ajustes de largura e overflow da sidebar ===== */
@@ -33,35 +36,95 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-#a
+# ======= USUÁRIOS via secrets.toml =======
+# Estrutura esperada em .streamlit/secrets.toml:
+# [usuarios]
+# Joao = "LibraJP"
+# Estevan = "14785236"
+# ...
+usuarios = st.secrets["usuarios"]
 
-# ======= SISTEMA DE LOGIN UNIFICADO =======
-usuarios = {
-    "Joao": "LibraJP",
-    "Estevan": "14785236",
-    "Breno": "LibraDRE2025",
-    "Juan": "LibraJM",
-    "Nelson": "LibraDRE2025"
-}
+# ======= COOKIES CRIPTOGRAFADOS =======
+cookies = EncryptedCookieManager(
+    prefix="libra_dash",
+    password=st.secrets["cookie_password"],  # definido no secrets.toml
+)
+if not cookies.ready():
+    st.stop()
 
+# ======= TOKEN HMAC (não guarda senha no cookie) =======
+AUTH_TTL_DAYS = 30  # validade do login lembrado
+
+def _make_token(usuario: str) -> str:
+    payload = {"u": usuario, "ts": int(time.time())}
+    msg = json.dumps(payload).encode()
+    secret = st.secrets["auth_secret"].encode()  # definido no secrets.toml
+    sig = hmac.new(secret, msg, hashlib.sha256).hexdigest()
+    b64 = base64.urlsafe_b64encode(msg).decode()
+    return f"{b64}.{sig}"
+
+def _check_token(token: str):
+    try:
+        b64, sig = token.split(".")
+        msg = base64.urlsafe_b64decode(b64.encode())
+        secret = st.secrets["auth_secret"].encode()
+        exp_sig = hmac.new(secret, msg, hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(sig, exp_sig):
+            return None
+        data = json.loads(msg.decode())
+        # expiração
+        if int(time.time()) - data["ts"] > AUTH_TTL_DAYS * 24 * 3600:
+            return None
+        return data["u"]
+    except Exception:
+        return None
+
+# ======= ESTADO DE SESSÃO =======
 if "autenticado" not in st.session_state:
     st.session_state.autenticado = False
+if "usuario" not in st.session_state:
+    st.session_state.usuario = None
 
+# ======= AUTO-LOGIN POR COOKIE =======
+token_cookie = cookies.get("auth_token")
+if token_cookie and not st.session_state.autenticado:
+    user_ok = _check_token(token_cookie)
+    if user_ok:
+        st.session_state.autenticado = True
+        st.session_state.usuario = user_ok
+
+# ======= LOGIN COM "LEMBRAR" =======
 if not st.session_state.autenticado:
     with st.form("login_form"):
         st.subheader("🔐 Área Restrita")
         usuario = st.text_input("Usuário:")
         senha = st.text_input("Senha:", type="password")
+        lembrar = st.checkbox("Lembrar meu acesso neste dispositivo", value=True)
         submit = st.form_submit_button("Entrar")
 
         if submit:
-            if usuario in usuarios and usuarios[usuario] == senha:
+            if usuario in usuarios and senha == usuarios[usuario]:
                 st.session_state.autenticado = True
+                st.session_state.usuario = usuario
+
+                if lembrar:
+                    cookies["auth_token"] = _make_token(usuario)
+                    cookies.save()  # grava cookie no navegador
+
                 st.success("Login realizado com sucesso!")
                 st.rerun()
             else:
                 st.error("Usuário ou senha inválidos.")
     st.stop()
+
+# ======= BOTÃO SAIR =======
+with st.sidebar:
+    st.caption(f"Conectado como **{st.session_state.usuario}**")
+    if st.button("Sair"):
+        st.session_state.clear()
+        cookies["auth_token"] = ""  # invalida o cookie
+        cookies.save()
+        st.rerun()
 
 # ======= MENU LATERAL =======
 menu = st.sidebar.radio("Selecione o painel:", ["📊 DRE dos Fundos", "📈 Posição Diária", "📉 Análise de PDD"]) 
