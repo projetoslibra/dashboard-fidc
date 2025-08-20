@@ -86,7 +86,13 @@ if "usuario" not in st.session_state:
     st.session_state.usuario = None
 
 # ======= AUTO-LOGIN POR COOKIE =======
-token_cookie = cookies.get("auth_token")
+token_cookie = None
+try:
+    token_val = cookies.get("auth_token")
+    token_cookie = token_val.strip() if token_val else None
+except Exception:
+    token_cookie = None
+
 if token_cookie and not st.session_state.autenticado:
     user_ok = _check_token(token_cookie)
     if user_ok:
@@ -119,11 +125,22 @@ if not st.session_state.autenticado:
 
 # ======= BOTÃO SAIR =======
 with st.sidebar:
-    st.caption(f"Conectado como **{st.session_state.usuario}**")
-    if st.button("Sair"):
-        st.session_state.clear()
-        cookies["auth_token"] = ""  # invalida o cookie
-        cookies.save()
+    user_label = st.session_state.get("usuario") or "—"
+    st.caption(f"Conectado como **{user_label}**")
+
+    if st.button("Sair", use_container_width=True):
+        # 1) Invalida o cookie (apaga o token do navegador)
+        try:
+            cookies["auth_token"] = ""   # string vazia
+            cookies.save()               # grava remoção
+        except Exception:
+            pass  # segue sem quebrar, mesmo se cookies não estiver pronto
+
+        # 2) Reseta apenas as chaves que controlam o login
+        st.session_state.autenticado = False
+        st.session_state.usuario = None
+
+        # 3) Força recarregar a app para exibir a tela de login
         st.rerun()
 
 # ======= MENU LATERAL =======
