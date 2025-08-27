@@ -100,10 +100,11 @@ def run():
     SHEET_ID = "1F4ziJnyxpLr9VuksbSvL21cjmGzoV0mDPSk7XzX72iQ"
 
     # === SELETOR DE FUNDO ===
-    fundo_sel = st.sidebar.selectbox("Selecione o fundo", ["Apuama", "Bristol"])
+    fundo_sel = st.sidebar.selectbox("Selecione o fundo", ["Apuama", "Bristol", "Consignado"])
     aba_map = {
         "Apuama": "Dre_Apuama",
-        "Bristol": "Dre_Bristol"
+        "Bristol": "Dre_Bristol",
+        "Consignado": "Dre_Consignado"
     }
     aba_original_map = {
         "Apuama": "Dre_Apuama_Original",
