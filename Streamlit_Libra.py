@@ -2,11 +2,8 @@ import streamlit as st
 import pandas as pd
 
 
-
 def run():
     caminho_logo = "G:/Drives compartilhados/13. DATA ANALYSIS/04. Logos/Capital - Branca.png"
-
-
 
     # =================== CORES ===================
     SPACE_CADET = "#042F3C"
@@ -16,8 +13,7 @@ def run():
     VERDE = "#a4f4b8"
     VERMELHO = "#f4b4b4"
 
-
-    # ========== CSS VISUAL PREMIUM ========== 
+    # ========== CSS VISUAL PREMIUM ==========
     st.markdown(f"""
     <style>
         html, body, .stApp, .block-container {{
@@ -99,19 +95,25 @@ def run():
     # ========== CÓDIGO DO SHEET ==========
     SHEET_ID = "1F4ziJnyxpLr9VuksbSvL21cjmGzoV0mDPSk7XzX72iQ"
 
-    # === SELETOR DE FUNDO ===
+    # === SELETOR DE FUNDO (ADICIONADO "Consignado") ===
     fundo_sel = st.sidebar.selectbox("Selecione o fundo", ["Apuama", "Bristol", "Consignado"])
+
+    # === MAPA DE ABAS (ADICIONADO "Consignado") ===
     aba_map = {
         "Apuama": "Dre_Apuama",
         "Bristol": "Dre_Bristol",
         "Consignado": "Dre_Consignado"
     }
+
+    # Mantido o dicionário original (sem entrada para Consignado)
     aba_original_map = {
         "Apuama": "Dre_Apuama_Original",
         "Bristol": "Dre_Bristol_Original"
+        # "Consignado" não possui Original
     }
+
     ABA = aba_map[fundo_sel]
-    ABA_ORIGINAL = aba_original_map[fundo_sel]
+    ABA_ORIGINAL = aba_original_map.get(fundo_sel)  # <- proteção para fundos sem "_Original"
 
     # ========== CARREGA DADOS ==========
     df = ler_google_sheet(SHEET_ID, ABA)
@@ -130,13 +132,10 @@ def run():
             .astype(float)
         )
 
-
-    # Título com logo à direita (usando st.columns + imagem local)
+    # Título com logo à direita
     col1, col2 = st.columns([0.75, 0.25])
-
     with col1:
         st.markdown(f"<h1 style='margin: 0; font-size: 2.3rem;'>DRE - Fundo {fundo_sel}</h1>", unsafe_allow_html=True)
-
     with col2:
         st.image("Imagens/Capital-branca.png", width=120)
 
@@ -156,9 +155,8 @@ def run():
         st.warning("Nenhum dado encontrado para a data selecionada.")
         st.stop()
 
-    # ========== EXIBE CARTÕES ========== 
-    st.markdown(f"### Indicadores para {data_sel.strftime('%d/%m/%Y')}")
-
+    # ========== EXIBE CARTÕES ==========
+    st.markdown(f"### Indicadores para {pd.to_datetime(data_sel).strftime('%d/%m/%Y')}")
     dados = df_filtrado.iloc[0]
     colunas_por_linha = 3
     cards = []
@@ -168,41 +166,39 @@ def run():
 
     for i, col in enumerate(colunas_numericas):
         valor = dados[col]
-
         estilo_cartao = f"width: {largura_cartao}; min-height: 120px; margin: {espacamento_cartao};"
 
         if col in colunas_cor_condicional:
             cor_fundo = VERDE if valor > 0 else VERMELHO
             html = f"""
-                <div class=\"card\" style=\"background-color:{cor_fundo}; {estilo_cartao}\">
+                <div class="card" style="background-color:{cor_fundo}; {estilo_cartao}">
                     <h4>{col}</h4>
                     <p>{formatar_valor(col, valor)}</p>
                 </div>
             """
         elif col == "Subordinação Mezanino" and valor < 20:
             html = f"""
-                <div class=\"card\" style=\"background-color:{VERMELHO}; {estilo_cartao}\">
+                <div class="card" style="background-color:{VERMELHO}; {estilo_cartao}">
                     <h4>{col}</h4>
                     <p>{formatar_valor(col, valor)}</p>
                 </div>
             """
         elif col == "Subordinação Senior" and valor < 40:
             html = f"""
-                <div class=\"card\" style=\"background-color:{VERMELHO}; {estilo_cartao}\">
+                <div class="card" style="background-color:{VERMELHO}; {estilo_cartao}">
                     <h4>{col}</h4>
                     <p>{formatar_valor(col, valor)}</p>
                 </div>
             """
         else:
             html = f"""
-                <div class=\"card\" style=\"{estilo_cartao}\">
+                <div class="card" style="{estilo_cartao}">
                     <h4>{col}</h4>
                     <p>{formatar_valor(col, valor)}</p>
                 </div>
             """
 
         cards.append(html)
-
 
     for i in range(0, len(cards), colunas_por_linha):
         cols = st.columns(colunas_por_linha)
@@ -214,18 +210,13 @@ def run():
     st.markdown("### Histórico Completo")
     st.dataframe(df, use_container_width=True, height=500)
 
-
     # ========== ABA ORIGINAL (VISUAL COMPLETO) ==========
     st.markdown("### Tabela Original (DRE Completa)")
 
-
-
-    #####################
     # Lê a aba original com cabeçalho na primeira linha da planilha
     def ler_google_sheet_original(sheet_id: str, aba: str) -> pd.DataFrame:
         aba_formatada = aba.replace(" ", "%20")
         url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={aba_formatada}"
-        
         df_raw = pd.read_csv(url, header=None)
         new_header = df_raw.iloc[0]
         df = df_raw[1:].copy()
@@ -233,96 +224,66 @@ def run():
         df = df.reset_index(drop=True)
         return df
 
-    df_original = ler_google_sheet_original(SHEET_ID, ABA_ORIGINAL)
-    
-    
-    #corte opcional para ignorar todas as linhas do sheet abaixo de "valor cota"
-    idx_end = df_original.index[
-        df_original.iloc[:, 0].astype(str).str.strip() == "Valor Cota"
-    ]
-    if not idx_end.empty:
-        df_original = df_original.loc[: idx_end[0]]
+    if ABA_ORIGINAL:
+        df_original = ler_google_sheet_original(SHEET_ID, ABA_ORIGINAL)
 
+        # corte opcional para ignorar todas as linhas do sheet abaixo de "Valor Cota"
+        idx_end = df_original.index[
+            df_original.iloc[:, 0].astype(str).str.strip() == "Valor Cota"
+        ]
+        if not idx_end.empty:
+            df_original = df_original.loc[: idx_end[0]]
 
-    # Insere linha em branco antes das linhas de destaque (exceto as 3 últimas)
-    indices_destaque = [
-        i for i, row in df_original.iterrows()
-        if str(row.iloc[0]).strip() in linhas_destaque
-    ]
+        # Insere linha em branco antes das linhas de destaque (exceto as 3 últimas)
+        indices_destaque = [
+            i for i, row in df_original.iterrows()
+            if str(row.iloc[0]).strip() in linhas_destaque
+        ]
+        indices_para_inserir = indices_destaque[:-3] if len(indices_destaque) > 3 else []
 
-    # Remover as 3 últimas linhas de destaque do processo de inserção
-    indices_para_inserir = indices_destaque[:-3] if len(indices_destaque) > 3 else []
+        for i in reversed(indices_para_inserir):
+            linha_em_branco = pd.Series([""] * len(df_original.columns), index=df_original.columns)
+            df_original = pd.concat([
+                df_original.iloc[:i],
+                pd.DataFrame([linha_em_branco]),
+                df_original.iloc[i:]
+            ], ignore_index=True)
 
-    for i in reversed(indices_para_inserir):
-        linha_em_branco = pd.Series([""] * len(df_original.columns), index=df_original.columns)
-        df_original = pd.concat([
-            df_original.iloc[:i],
-            pd.DataFrame([linha_em_branco]),
-            df_original.iloc[i:]
-        ], ignore_index=True)
+        # Estiliza cabeçalho e células da tabela final
+        st.markdown(f"""
+            <style>
+                table thead th {{
+                    font-weight: 900 !important;
+                    text-align: center !important;
+                    color: {HONEYDEW} !important;
+                }}
+                table tbody td {{
+                    text-align: center !important;
+                    vertical-align: middle !important;
+                }}
+            </style>
+        """, unsafe_allow_html=True)
 
-    # Estiliza cabeçalho e células da tabela final
-    st.markdown(f"""
-        <style>
-            table thead th {{
-                font-weight: 900 !important;
-                text-align: center !important;
-                color: {HONEYDEW} !important;
-            }}
-            table tbody td {{
-                text-align: center !important;
-                vertical-align: middle !important;
-            }}
-        </style>
-    """, unsafe_allow_html=True)
+        # Função para destacar linhas especiais
+        def highlight_linhas_especiais(row):
+            if str(row.iloc[0]).strip() in linhas_destaque:
+                return ['background-color: #66c4ff; font-weight: bold'] * len(row)
+            return [''] * len(row)
 
-    # Função para destacar linhas especiais
-    def highlight_linhas_especiais(row):
-        if str(row.iloc[0]).strip() in linhas_destaque:
-            return ['background-color: #66c4ff; font-weight: bold'] * len(row)
-        return [''] * len(row)
+        table_styles = [
+            {"selector": "td", "props": [("text-align", "center"), ("vertical-align", "middle")]},
+            {"selector": "th", "props": [("text-align", "center"), ("font-weight", "900"), ("color", HONEYDEW)]}
+        ]
 
-    table_styles = [
-        {"selector": "td", "props": [("text-align", "center"), ("vertical-align", "middle")]},
-        {"selector": "th", "props": [("text-align", "center"), ("font-weight", "900"), ("color", HONEYDEW)]}
-    ]
+        st.dataframe(
+            df_original.style
+                .apply(highlight_linhas_especiais, axis=1)
+                .set_table_styles(table_styles),
+            use_container_width=True,
+            height=500
+        )
+    else:
+        st.info("Este fundo não possui DRE Original.")
 
-    # Exibe a tabela com estilos aplicados
-    st.dataframe(
-        df_original.style
-            .apply(highlight_linhas_especiais, axis=1)
-            .set_table_styles(table_styles),
-        use_container_width=True,
-        height=500
-    )
-    ##############################
-
-
-
-    # Estiliza cabeçalho e células da tabela final
-    st.markdown(f"""
-        <style>
-            table thead th {{
-                font-weight: 900 !important;
-                text-align: center !important;
-                color: {HONEYDEW} !important;
-            }}
-            table tbody td {{
-                text-align: center !important;
-                vertical-align: middle !important;
-            }}
-        </style>
-    """, unsafe_allow_html=True)
-
-
-
-    def highlight_linhas_especiais(row):
-        if str(row[0]).strip() in linhas_destaque:
-            return ['background-color: #66c4ff; font-weight: bold'] * len(row)
-        return [''] * len(row)
-
-    # Estilos CSS para centralizar conteúdo e cabeçalhos
-    table_styles = [
-        {"selector": "td", "props": [("text-align", "center"), ("vertical-align", "middle")]},
-        {"selector": "th", "props": [("text-align", "center"), ("font-weight", "900"), ("color", HONEYDEW)]}
-    ]
+    # (Os blocos de estilo duplicados do original foram mantidos logicamente,
+    # mas sem necessidade de repetir aqui para evitar redefinições.)
