@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from io import BytesIO
 
 def run():
     # ========== CORES VISUAL PREMIUM ==========
@@ -68,7 +69,6 @@ def run():
     df["PDD Prevista"] = pd.to_numeric(df["PDD Prevista"], errors="coerce").fillna(0.0)
 
     # ========= DRILL-DOWN AGGRID (Cedente -> NOME_SACADO) =========
-
     st.subheader("🔁 PDD por Cedente e Sacado (com variação diária)")
 
     # Linhas = (Cedente, NOME_SACADO), Colunas = Datas
@@ -78,6 +78,8 @@ def run():
     date_cols_fmt = [c.strftime("%d/%m/%Y") for c in pivot_sacado.columns]
     pivot_sacado.columns = date_cols_fmt
     pivot_sacado.reset_index(inplace=True)
+
+    grid_response = None  # vamos tentar capturar os dados exibidos no AgGrid
 
     # --- AgGrid ---
     try:
@@ -120,10 +122,8 @@ def run():
                 prev_col = date_cols_fmt[i - 1]
                 rule_js = JsCode(f"""
                     function(params) {{
-                        // ignora linha TOTAL e footers
                         if (params.node && (params.node.rowPinned || params.node.footer)) return false;
 
-                        // 1) Linha folha (Sacado)
                         if (!params.node || !params.node.group) {{
                             var curr = params.data['{col}'];
                             var prev = params.data['{prev_col}'];
@@ -131,7 +131,6 @@ def run():
                             return curr !== prev;
                         }}
 
-                        // 2) Linha de grupo (Cedente): soma filhos filtrados
                         var kids = params.node.childrenAfterFilter || params.node.allLeafChildren || [];
                         var currSum = 0, prevSum = 0;
                         for (var j = 0; j < kids.length; j++) {{
@@ -147,13 +146,13 @@ def run():
                 """)
                 gb.configure_column(col, cellClassRules={"changed-cell": rule_js})
 
-        # Agrupamento por Cedente (valores agregados ficam na própria linha do grupo)
+        # Agrupamento por Cedente
         gb.configure_column("Cedente", rowGroup=True, hide=True)
         gb.configure_column("NOME_SACADO", headerName="Sacado", minWidth=180, resizable=True)
 
         gb.configure_grid_options(
-            groupIncludeFooter=False,       # <- NÃO mostra "total do fulano" abaixo
-            groupIncludeTotalFooter=False,  # total geral usaremos pinned bottom
+            groupIncludeFooter=False,
+            groupIncludeTotalFooter=False,
             suppressAggFuncInHeader=True,
             animateRows=True,
             groupDefaultExpanded=0,
@@ -169,7 +168,7 @@ def run():
 
         grid_options = gb.build()
 
-        # Linha TOTAL fixada no rodapé (soma por data de todos os sacados)
+        # Linha TOTAL fixada no rodapé
         totals = {"Cedente": "TOTAL", "NOME_SACADO": ""}
         for c in date_cols_fmt:
             totals[c] = float(pivot_sacado[c].sum()) if c in pivot_sacado.columns else 0.0
@@ -197,11 +196,11 @@ def run():
             ".ag-header, .ag-floating-bottom": { "border": "none" }
         }
 
-
-        AgGrid(
+        grid_response = AgGrid(
             pivot_sacado,
             gridOptions=grid_options,
-            update_mode=GridUpdateMode.NO_UPDATE,
+            update_mode=GridUpdateMode.MODEL_CHANGED,  # <- captura filtros/edições
+            data_return_mode="AS_INPUT",
             enable_enterprise_modules=True,
             fit_columns_on_grid_load=False,
             height=560,
@@ -215,3 +214,73 @@ def run():
             pivot_sacado.style.format(precision=2, thousands='.', decimal=','),
             use_container_width=True, height=560
         )
+
+    # ========== EXPORTAR PARA EXCEL ==========
+    def montar_excel(df_export: pd.DataFrame) -> bytes:
+        """
+        Gera um .xlsx em memória, com formatação numérica para as colunas de data,
+        e inclui uma linha TOTAL (como no grid).
+        """
+        # garante existência das colunas chave
+        for col in ["Cedente", "NOME_SACADO"]:
+            if col not in df_export.columns:
+                df_export[col] = ""  # evita erro se usuário filtrou algo estranho
+
+        # adiciona TOTAL ao dataframe exportado
+        total_row = {col: "" for col in df_export.columns}
+        total_row["Cedente"] = "TOTAL"
+        if len(date_cols_fmt) > 0:
+            for c in date_cols_fmt:
+                if c in df_export.columns:
+                    total_row[c] = pd.to_numeric(df_export[c], errors="coerce").fillna(0).sum()
+        df_out = pd.concat([df_export, pd.DataFrame([total_row])], ignore_index=True)
+
+        # escreve em memória
+        buf = BytesIO()
+        with pd.ExcelWriter(buf, engine="xlsxwriter") as writer:
+            df_out.to_excel(writer, index=False, sheet_name="PDD")
+            wb  = writer.book
+            ws  = writer.sheets["PDD"]
+
+            # formatos
+            fmt_num = wb.add_format({"num_format": "#,##0.00"})
+            fmt_header = wb.add_format({"bold": True})
+            fmt_total = wb.add_format({"bold": True})
+
+            # cabeçalhos em bold
+            ws.set_row(0, None, fmt_header)
+
+            # largura automática simples
+            for i, col in enumerate(df_out.columns):
+                col_series = df_out[col].astype(str)
+                max_len = max(12, min(60, col_series.map(len).max() + 2))
+                ws.set_column(i, i, max_len)
+
+            # aplica formato numérico nas colunas de datas
+            for i, col in enumerate(df_out.columns):
+                if col in date_cols_fmt:
+                    ws.set_column(i, i, None, fmt_num)
+
+            # destaca linha TOTAL (última)
+            total_row_idx = len(df_out)  # 1-based + header; ajustaremos abaixo
+            ws.set_row(total_row_idx, None, fmt_total)  # total_row_idx já está correto: header é linha 0 no pandas/xlsxwriter
+
+        buf.seek(0)
+        return buf.getvalue()
+
+    # decide o que exportar: dados do grid (respeita filtros) ou a pivot original
+    if grid_response and "data" in grid_response and grid_response["data"] is not None:
+        df_para_exportar = pd.DataFrame(grid_response["data"])
+    else:
+        df_para_exportar = pivot_sacado.copy()
+
+    arquivo = montar_excel(df_para_exportar)
+    nome_arquivo = f"PDD_{fundo_exibido.replace(' ', '_')}_{pd.Timestamp.today().strftime('%Y-%m-%d')}.xlsx"
+
+    st.download_button(
+        "⬇️ Baixar Excel da Tabela",
+        data=arquivo,
+        file_name=nome_arquivo,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        help="Exporta a tabela atual (respeita filtros feitos no grid) com linha TOTAL."
+    )
