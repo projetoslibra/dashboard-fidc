@@ -142,9 +142,9 @@ def run():
         df_estoque = pd.read_excel(uploaded_file)
     elif os.path.exists(tmp_path):
         df_estoque = pd.read_excel(tmp_path)
-        st.info(f"Usando arquivo salvo anteriormente para {fundo_sel}.")
+        st.markdown(f"<span style='color:{HARVEST_GOLD};'>Usando arquivo salvo anteriormente para {fundo_sel}.</span>", unsafe_allow_html=True)
     else:
-        st.warning("Nenhum arquivo enviado ainda.")
+        st.markdown(f"<span style='color:{HARVEST_GOLD};'>Nenhum arquivo enviado ainda.</span>", unsafe_allow_html=True)
         df_estoque = None
 
     if df_estoque is not None:
@@ -176,7 +176,11 @@ def run():
         data_pl = df_pl["Data"].max()
         pl_fundo = converter_valor_br(df_pl.loc[df_pl["Data"] == data_pl, "PL TOTAL"].values[0])
 
-        st.markdown(f"<span style='color:{HARVEST_GOLD};font-weight:700'>PL usado ({fundo_sel} - {data_pl.strftime('%d/%m/%Y')}):</span> R$ {pl_fundo:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."), unsafe_allow_html=True)
+        st.markdown(
+            f"<span style='color:{HARVEST_GOLD};font-weight:700'>PL usado ({fundo_sel} - {data_pl.strftime('%d/%m/%Y')}): R$ {pl_fundo:,.2f}</span>"
+            .replace(",", "X").replace(".", ",").replace("X", "."),
+            unsafe_allow_html=True
+        )
 
         # Cedentes
         df_cedentes = df_estoque.groupby(["Cedente", "CNPJ_Cedente"], as_index=False)["Valor"].sum()
@@ -187,12 +191,12 @@ def run():
         top5_cedentes = df_cedentes.head(5)["%PL"].sum()
 
         st.metric(
-            label="Maior Cedente",
+            label=f"Maior Cedente",
             value=f"{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%",
             delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite"
         )
         st.metric(
-            label="Top 5 Cedentes",
+            label=f"Top 5 Cedentes",
             value=f"{top5_cedentes:.2f}%",
             delta="✅ Enquadrado" if top5_cedentes <= limites["top_cedentes"] else "❌ Fora do Limite"
         )
