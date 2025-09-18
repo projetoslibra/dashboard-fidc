@@ -174,18 +174,14 @@ def run():
             f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%</span>",
             unsafe_allow_html=True
         )
-        st.metric(
-            "",
-            "",
-            delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite"
-        )
+        st.metric("", "", delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite")
 
         st.markdown(f"<h3>Top 5 Cedentes</h3>", unsafe_allow_html=True)
-        st.metric(
-            "",
-            f"{top5_cedentes:.2f}%",
-            delta="✅ Enquadrado" if top5_cedentes <= limites["top_cedentes"] else "❌ Fora do Limite"
+        st.markdown(
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{top5_cedentes:.2f}%</span>",
+            unsafe_allow_html=True
         )
+        st.metric("", "", delta="✅ Enquadrado" if top5_cedentes <= limites["top_cedentes"] else "❌ Fora do Limite")
 
         df_cedentes["Valor"] = df_cedentes["Valor"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         df_cedentes["%PL"] = df_cedentes["%PL"].apply(lambda x: f"{x:.2f}%")
@@ -206,18 +202,14 @@ def run():
             f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%</span>",
             unsafe_allow_html=True
         )
-        st.metric(
-            "",
-            "",
-            delta="✅ Enquadrado" if maior_sacado['%PL'] <= limites["maior_sacado"] else "❌ Fora do Limite"
-        )
+        st.metric("", "", delta="✅ Enquadrado" if maior_sacado['%PL'] <= limites["maior_sacado"] else "❌ Fora do Limite")
 
         st.markdown(f"<h3>Top {'10' if fundo_sel == 'Apuama' else '5'} Sacados</h3>", unsafe_allow_html=True)
-        st.metric(
-            "",
-            f"{topN_sacados:.2f}%",
-            delta="✅ Enquadrado" if topN_sacados <= limites["top_sacados"] else "❌ Fora do Limite"
+        st.markdown(
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{topN_sacados:.2f}%</span>",
+            unsafe_allow_html=True
         )
+        st.metric("", "", delta="✅ Enquadrado" if topN_sacados <= limites["top_sacados"] else "❌ Fora do Limite")
 
         df_sacados["Valor"] = df_sacados["Valor"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         df_sacados["%PL"] = df_sacados["%PL"].apply(lambda x: f"{x:.2f}%")
