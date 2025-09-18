@@ -45,6 +45,11 @@ def run():
         .main .block-container {{
             max-width: 100vw!important;
         }}
+        /* 🔥 Padronizando métricas */
+        div[data-testid="stMetricLabel"] > div {{
+            color: {HARVEST_GOLD} !important;
+            font-weight: 700 !important;
+        }}
     </style>
     """, unsafe_allow_html=True)
 
@@ -105,7 +110,7 @@ def run():
             st.markdown(
                 f"""
                 <span style='
-                    color: {HONEYDEW};
+                    color: {HARVEST_GOLD};
                     font-size: 2.4rem;
                     font-weight:900;
                     border-bottom: 2px solid {HARVEST_GOLD}99;
@@ -167,7 +172,7 @@ def run():
         data_pl = df_pl["Data"].max()
         pl_fundo = converter_valor_br(df_pl.loc[df_pl["Data"] == data_pl, "PL TOTAL"].values[0])
 
-        st.markdown(f"**PL usado ({fundo_sel} - {data_pl.strftime('%d/%m/%Y')}):** R$ {pl_fundo:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+        st.markdown(f"<span style='color:{HARVEST_GOLD};font-weight:700'>PL usado ({fundo_sel} - {data_pl.strftime('%d/%m/%Y')}):</span> R$ {pl_fundo:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."), unsafe_allow_html=True)
 
         # Cedentes
         df_cedentes = df_estoque.groupby(["Cedente", "CNPJ_Cedente"], as_index=False)["Valor"].sum()
@@ -178,20 +183,20 @@ def run():
         top5_cedentes = df_cedentes.head(5)["%PL"].sum()
 
         st.metric(
-            "Maior Cedente",
-            f"{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%",
+            label="Maior Cedente",
+            value=f"{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%",
             delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite"
         )
         st.metric(
-            "Top 5 Cedentes",
-            f"{top5_cedentes:.2f}%",
+            label="Top 5 Cedentes",
+            value=f"{top5_cedentes:.2f}%",
             delta="✅ Enquadrado" if top5_cedentes <= limites["top_cedentes"] else "❌ Fora do Limite"
         )
 
         df_cedentes["Valor"] = df_cedentes["Valor"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         df_cedentes["%PL"] = df_cedentes["%PL"].apply(lambda x: f"{x:.2f}%")
 
-        st.markdown("#### Cedentes")
+        st.markdown(f"<h3>Cedentes</h3>", unsafe_allow_html=True)
         st.dataframe(df_cedentes, use_container_width=True, height=400)
 
         # Sacados
@@ -203,28 +208,18 @@ def run():
         topN_sacados = df_sacados.head(10 if fundo_sel == "Apuama" else 5)["%PL"].sum()
 
         st.metric(
-            "Maior Sacado",
-            f"{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%",
+            label="Maior Sacado",
+            value=f"{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%",
             delta="✅ Enquadrado" if maior_sacado['%PL'] <= limites["maior_sacado"] else "❌ Fora do Limite"
         )
         st.metric(
-            f"Top {'10' if fundo_sel == 'Apuama' else '5'} Sacados",
-            f"{topN_sacados:.2f}%",
+            label=f"Top {'10' if fundo_sel == 'Apuama' else '5'} Sacados",
+            value=f"{topN_sacados:.2f}%",
             delta="✅ Enquadrado" if topN_sacados <= limites["top_sacados"] else "❌ Fora do Limite"
         )
 
         df_sacados["Valor"] = df_sacados["Valor"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         df_sacados["%PL"] = df_sacados["%PL"].apply(lambda x: f"{x:.2f}%")
 
-        st.markdown("#### Sacados")
+        st.markdown(f"<h3>Sacados</h3>", unsafe_allow_html=True)
         st.dataframe(df_sacados, use_container_width=True, height=400)
-
-    # RODAPÉ
-    st.markdown(
-        f"""<p style="text-align: right; color: {HONEYDEW}; font-size: 1em;">
-            Powered by Juan & Streamlit | <b style="color:{HARVEST_GOLD}">LIBRA CAPITAL</b> 🦁
-        </p>""",
-        unsafe_allow_html=True,
-
-        
-    )
