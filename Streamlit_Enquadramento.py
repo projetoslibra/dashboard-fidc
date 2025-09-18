@@ -170,9 +170,13 @@ def run():
         top5_cedentes = df_cedentes.head(5)["%PL"].sum()
 
         st.markdown(f"<h3>Maior Cedente</h3>", unsafe_allow_html=True)
+        st.markdown(
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%</span>",
+            unsafe_allow_html=True
+        )
         st.metric(
             "",
-            f"{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%",
+            "",
             delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite"
         )
 
@@ -198,9 +202,13 @@ def run():
         topN_sacados = df_sacados.head(10 if fundo_sel == "Apuama" else 5)["%PL"].sum()
 
         st.markdown(f"<h3>Maior Sacado</h3>", unsafe_allow_html=True)
+        st.markdown(
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%</span>",
+            unsafe_allow_html=True
+        )
         st.metric(
             "",
-            f"{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%",
+            "",
             delta="✅ Enquadrado" if maior_sacado['%PL'] <= limites["maior_sacado"] else "❌ Fora do Limite"
         )
 
