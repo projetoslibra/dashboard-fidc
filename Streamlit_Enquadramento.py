@@ -50,6 +50,10 @@ def run():
             color: {HARVEST_GOLD} !important;
             font-weight: 700 !important;
         }}
+        div[data-testid="stMetricValue"] > div {{
+            color: {HARVEST_GOLD} !important;
+            font-weight: 700 !important;
+        }}
     </style>
     """, unsafe_allow_html=True)
 
