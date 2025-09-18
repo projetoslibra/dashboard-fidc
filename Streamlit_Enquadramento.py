@@ -5,7 +5,6 @@ from io import StringIO
 import os
 
 def run():
-
     # =================== CORES ===================
     SPACE_CADET = "#042F3C"
     HARVEST_GOLD = "#C66300"
@@ -27,10 +26,6 @@ def run():
             color: {HARVEST_GOLD}!important;
             font-size: 1.3rem!important;
         }}
-        h4 {{
-            color: {HARVEST_GOLD}!important;
-            font-weight: 700!important;
-        }}
         .table-title {{
             color: {HARVEST_GOLD}; font-size:1.2rem; font-weight:700;
         }}
@@ -49,6 +44,11 @@ def run():
         .stDataFrame {{border:2px solid {SLATE_GRAY}!important; border-radius:10px!important;}}
         .main .block-container {{
             max-width: 100vw!important;
+        }}
+        /* Barra lateral padronizada */
+        section[data-testid="stSidebar"] {{
+            background-color: #F5F5F5 !important;
+            color: {SPACE_CADET} !important;
         }}
     </style>
     """, unsafe_allow_html=True)
@@ -77,18 +77,8 @@ def run():
 
     # ========== LIMITES DE ENQUADRAMENTO ==========
     LIMITES = {
-        "Apuama": {
-            "maior_cedente": 10,
-            "top_cedentes": 40,
-            "maior_sacado": 10,
-            "top_sacados": 35
-        },
-        "Bristol": {
-            "maior_cedente": 7,
-            "top_cedentes": 40,
-            "maior_sacado": 10,
-            "top_sacados": 25
-        }
+        "Apuama": {"maior_cedente": 10, "top_cedentes": 40, "maior_sacado": 10, "top_sacados": 35},
+        "Bristol": {"maior_cedente": 7, "top_cedentes": 40, "maior_sacado": 10, "top_sacados": 25}
     }
 
     # Cedentes que devem virar sacados
@@ -100,8 +90,6 @@ def run():
     ]
 
     # ========== APP ENQUADRAMENTO ==========
-
-    # HEADER
     with st.container():
         cols = st.columns([0.095, 0.905])
         with cols[0]:
@@ -116,7 +104,7 @@ def run():
                     border-bottom: 2px solid {HARVEST_GOLD}99;
                     padding-bottom: 0.12em;'>
                     LIBRA CAPITAL
-                    <span style='font-weight:400;color:{HARVEST_GOLD};'>| Enquadramento</span>
+                    <span style='font-weight:400;'>| Enquadramento</span>
                 </span>
                 """,
                 unsafe_allow_html=True
@@ -127,18 +115,16 @@ def run():
     fundo_sel = st.selectbox("Selecione o fundo", ["Apuama", "Bristol"])
     limites = LIMITES[fundo_sel]
 
-    # caminho salvo em /tmp
     tmp_path = f"/tmp/{fundo_sel}.xlsx"
 
     uploaded_file = st.file_uploader(f"Envie o arquivo de estoque ({fundo_sel})", type=["xlsx"], key=f"upload_{fundo_sel}")
     if uploaded_file is not None:
-        # salva o arquivo em /tmp
         with open(tmp_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
         df_estoque = pd.read_excel(uploaded_file)
     elif os.path.exists(tmp_path):
         df_estoque = pd.read_excel(tmp_path)
-        st.info(f"<span style='color:{HARVEST_GOLD};'>Usando arquivo salvo anteriormente para {fundo_sel}.</span>", unsafe_allow_html=True)
+        st.markdown(f"<span style='color:{HARVEST_GOLD};'>Usando arquivo salvo anteriormente para {fundo_sel}.</span>", unsafe_allow_html=True)
     else:
         st.warning("Nenhum arquivo enviado ainda.")
         df_estoque = None
@@ -152,15 +138,12 @@ def run():
             "VALOR_NOMINAL": "Valor"
         })
 
-        # substitui cedente -> sacado
         mask = df_estoque["Cedente"].isin(CEDENTES_SUBSTITUIR)
         df_estoque.loc[mask, "Cedente"] = df_estoque.loc[mask, "Sacado"]
         df_estoque.loc[mask, "CNPJ_Cedente"] = df_estoque.loc[mask, "CNPJ_Sacado"]
 
-        # consolida
         df_estoque = df_estoque.groupby(["Cedente", "CNPJ_Cedente", "Sacado", "CNPJ_Sacado"], as_index=False)["Valor"].sum()
 
-        # PL
         GOOGLE_SHEET_ID = "1F4ziJnyxpLr9VuksbSvL21cjmGzoV0mDPSk7XzX72iQ"
         aba_pl = "Dre_Apuama" if fundo_sel == "Apuama" else "Dre_Bristol"
         url_pl = f"https://docs.google.com/spreadsheets/d/{GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&sheet={aba_pl}"
@@ -173,7 +156,7 @@ def run():
         pl_fundo = converter_valor_br(df_pl.loc[df_pl["Data"] == data_pl, "PL TOTAL"].values[0])
 
         st.markdown(
-            f"<b style='color:{HARVEST_GOLD};'>PL usado ({fundo_sel} - {data_pl.strftime('%d/%m/%Y')}):</b> "
+            f"<span style='color:{HARVEST_GOLD}; font-weight:700;'>PL usado ({fundo_sel} - {data_pl.strftime('%d/%m/%Y')}):</span> "
             f"<span style='color:{HARVEST_GOLD};'>R$ {pl_fundo:,.2f}</span>".replace(",", "X").replace(".", ",").replace("X", "."),
             unsafe_allow_html=True
         )
@@ -186,27 +169,19 @@ def run():
         maior_cedente = df_cedentes.iloc[0]
         top5_cedentes = df_cedentes.head(5)["%PL"].sum()
 
-        st.markdown(f"<h4>Maior Cedente</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h3>Maior Cedente</h3>", unsafe_allow_html=True)
         st.markdown(
-            f"<span style='color:{HARVEST_GOLD}; font-weight:700;'>{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%</span>",
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{maior_cedente['Cedente']} - {maior_cedente['%PL']:.2f}%</span>",
             unsafe_allow_html=True
         )
-        st.metric(
-            "",
-            "",
-            delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite"
-        )
+        st.metric("", "", delta="✅ Enquadrado" if maior_cedente['%PL'] <= limites["maior_cedente"] else "❌ Fora do Limite")
 
-        st.markdown(f"<h4>Top 5 Cedentes</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h3>Top 5 Cedentes</h3>", unsafe_allow_html=True)
         st.markdown(
-            f"<span style='color:{HARVEST_GOLD}; font-weight:700;'>{top5_cedentes:.2f}%</span>",
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{top5_cedentes:.2f}%</span>",
             unsafe_allow_html=True
         )
-        st.metric(
-            "",
-            "",
-            delta="✅ Enquadrado" if top5_cedentes <= limites["top_cedentes"] else "❌ Fora do Limite"
-        )
+        st.metric("", "", delta="✅ Enquadrado" if top5_cedentes <= limites["top_cedentes"] else "❌ Fora do Limite")
 
         df_cedentes["Valor"] = df_cedentes["Valor"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         df_cedentes["%PL"] = df_cedentes["%PL"].apply(lambda x: f"{x:.2f}%")
@@ -222,27 +197,19 @@ def run():
         maior_sacado = df_sacados.iloc[0]
         topN_sacados = df_sacados.head(10 if fundo_sel == "Apuama" else 5)["%PL"].sum()
 
-        st.markdown(f"<h4>Maior Sacado</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h3>Maior Sacado</h3>", unsafe_allow_html=True)
         st.markdown(
-            f"<span style='color:{HARVEST_GOLD}; font-weight:700;'>{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%</span>",
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{maior_sacado['Sacado']} - {maior_sacado['%PL']:.2f}%</span>",
             unsafe_allow_html=True
         )
-        st.metric(
-            "",
-            "",
-            delta="✅ Enquadrado" if maior_sacado['%PL'] <= limites["maior_sacado"] else "❌ Fora do Limite"
-        )
+        st.metric("", "", delta="✅ Enquadrado" if maior_sacado['%PL'] <= limites["maior_sacado"] else "❌ Fora do Limite")
 
-        st.markdown(f"<h4>Top {'10' if fundo_sel == 'Apuama' else '5'} Sacados</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h3>Top {'10' if fundo_sel == 'Apuama' else '5'} Sacados</h3>", unsafe_allow_html=True)
         st.markdown(
-            f"<span style='color:{HARVEST_GOLD}; font-weight:700;'>{topN_sacados:.2f}%</span>",
+            f"<span style='color:{HARVEST_GOLD}; font-size:1.4rem; font-weight:700;'>{topN_sacados:.2f}%</span>",
             unsafe_allow_html=True
         )
-        st.metric(
-            "",
-            "",
-            delta="✅ Enquadrado" if topN_sacados <= limites["top_sacados"] else "❌ Fora do Limite"
-        )
+        st.metric("", "", delta="✅ Enquadrado" if topN_sacados <= limites["top_sacados"] else "❌ Fora do Limite")
 
         df_sacados["Valor"] = df_sacados["Valor"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
         df_sacados["%PL"] = df_sacados["%PL"].apply(lambda x: f"{x:.2f}%")
