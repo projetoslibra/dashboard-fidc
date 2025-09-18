@@ -100,7 +100,7 @@ def run():
     with st.container():
         cols = st.columns([0.095, 0.905])
         with cols[0]:
-            st.image("imagens/Capital-branca.png", width=400, output_format="PNG")
+            st.image("Imagens/Capital-branca.png", width=400)
         with cols[1]:
             st.markdown(
                 f"""
