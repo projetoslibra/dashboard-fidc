@@ -49,6 +49,13 @@ def run():
         .main .block-container {{
             max-width: 100vw!important;
         }}
+        /* Sidebar */
+    section[data-testid="stSidebar"] .css-1d391kg, 
+    section[data-testid="stSidebar"] label, 
+    section[data-testid="stSidebar"] p {{
+        color: {HARVEST_GOLD} !important;
+        font-weight: 600 !important;
+        }}
     </style>
     """, unsafe_allow_html=True)
 
