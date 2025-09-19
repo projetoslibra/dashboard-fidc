@@ -111,7 +111,9 @@ def run():
                     padding-bottom: 0.12em;'>
                     LIBRA CAPITAL
                 </span>
-                <span style='color:{HARVEST_GOLD}; font-weight:400;'>
+                <span style='color:{HARVEST_GOLD};
+                   font-size: 2.0rem;
+                   font-weight:500;'>
                     | Enquadramento
                 </span>
                 """,
