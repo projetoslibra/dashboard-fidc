@@ -96,25 +96,25 @@ def run():
     ]
 
     # ========== APP ENQUADRAMENTO ==========
-    with st.container():
-        cols = st.columns([0.095, 0.905])
-        with cols[0]:
-            st.image("Imagens/Capital-branca.png", width=120)
-        with cols[1]:
-            st.markdown(
-                f"""
-                <span style='
-                    color: {HARVEST_GOLD};
-                    font-size: 2.4rem;
-                    font-weight:900;
-                    border-bottom: 2px solid {HARVEST_GOLD}99;
-                    padding-bottom: 0.12em;'>
-                    LIBRA CAPITAL
-                    <span style='font-weight:400;'>| Enquadramento</span>
-                </span>
-                """,
-                unsafe_allow_html=True
-            )
+with st.container():
+    cols = st.columns([0.095, 0.905])
+    with cols[0]:
+        st.image("Imagens/Capital-branca.png", width=120)
+    with cols[1]:
+        st.markdown(
+            f"""
+            <span style='
+                color: {HONEYDEW};
+                font-size: 2.4rem;
+                font-weight:900;
+                border-bottom: 2px solid {HARVEST_GOLD}99;
+                padding-bottom: 0.12em;'>
+                LIBRA CAPITAL
+                <span style='color:{HARVEST_GOLD}; font-weight:400;'>| Enquadramento</span>
+             </span>
+             """,
+             unsafe_allow_html=True
+        )
 
     st.markdown('<br/>', unsafe_allow_html=True)
 
